@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sun.java.swing.plaf.gtk.resources.gtk_zh_TW;
+//import com.sun.java.swing.plaf.gtk.resources.gtk_zh_TW;
 import com.sun.java.swing.plaf.windows.resources.windows_zh_TW;
 
 /** 
@@ -15,7 +15,8 @@ import com.sun.java.swing.plaf.windows.resources.windows_zh_TW;
 public class BasicDocument extends Document 
 {
 	private String wordPattern = "[a-zA-Z]+";
-	private String syllablePattern = "[aeiouy]+";
+	private String syllablePattern = "[aeiouyAEIOUY]+";
+	private String silentEPattern = "[aeiouyAEIOUY]+e$";
 	/** Create a new BasicDocument object
 	 * 
 	 * @param text The full text of the Document.
@@ -73,30 +74,36 @@ public class BasicDocument extends Document
 	{
 	    //TODO: Implement this method.  See the Module 1 support videos 
         // if you need help.
-	//int numSyllables = 0;
-//	List<String> words = getTokens(wordPattern);
-//	int numSyllables = 0;
-//	Pattern syllPtn = Pattern.compile(syllablePattern);	
+	int numSyllablesInSentence = 0;
+	List<String> words = getTokens(wordPattern);
+	Pattern syllPtn = Pattern.compile(syllablePattern);	
+	Pattern silentEPtn = Pattern.compile(silentEPattern);
 //	int syllableMatches = 0;
-//	for (String word:words){
+	for (String word:words){
 		
 			//ArrayList<String> tokens = new ArrayList<String>();
-//			int numSyllablesInWord = 0;
-//			Matcher m = syllPtn.matcher(word);
+			int numSyllablesInWord = 0;
+			Matcher syllableMatcher = syllPtn.matcher(word);
+			Matcher silentEMatcher = silentEPtn.matcher(word);
+			boolean eAtEnd = false;
+			if (word.charAt(word.length() - 1) == 'e') eAtEnd = true;
+			while (syllableMatcher.find()) {
+				numSyllablesInSentence++;
+				numSyllablesInWord++;
 			
-//			while (m.find()) {
-//				syllableMatches++;
-//				numSyllablesInWord++;
-				//tokens.add(m.group());	
-//			}
 			
+			}
 			
+	
+			
+			if (numSyllablesInWord > 1 && eAtEnd && !silentEMatcher.find() ) {
+				numSyllablesInSentence--;
+				}
 
-		
-//	}
-		
-		
-		return 0;
+			}
+
+		return numSyllablesInSentence;
+
 		
 	}
 	
@@ -105,13 +112,17 @@ public class BasicDocument extends Document
 	 * You are encouraged to add your own tests.  */
 	public static void main(String[] args)
 	{
-		testCase(new BasicDocument("This is a test.  How many???  "
+		testCase(new BasicDocument("double"),
+				1, 1, 1);
+		testCase(new BasicDocument("segue"),
+				2, 1, 1);
+/*		testCase(new BasicDocument("This is a test.  How many???  "
 		        + "Senteeeeeeeeeences are here... there should be 5!  Right?"),
 				16, 13, 5);
 		testCase(new BasicDocument(""), 0, 0, 0);
 		testCase(new BasicDocument("sentence, with, lots, of, commas.!  "
 		        + "(And some poaren)).  The output is: 7.5."), 15, 11, 4);
-		testCase(new BasicDocument("many???  Senteeeeeeeeeences are"), 6, 3, 2);		
+		testCase(new BasicDocument("many???  Senteeeeeeeeeences are"), 6, 3, 2);*/		
 	}
 	
 }
